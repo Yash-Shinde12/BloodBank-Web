@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/Yash-Shinde12/Blood-Bank.git'
+                git branch: 'main', url: 'https://github.com/Yash-Shinde12/BloodBank-Web.git'
             }
         }
 
