@@ -1,0 +1,5 @@
+{
+  "name": "CloudBlood - Blood Banking Dashboard",
+  "description": "A cloud-based blood bank management system for tracking inventory, donors, and emergency requests.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,76 @@
+{
+  "entities": {
+    "Inventory": {
+      "title": "Inventory",
+      "description": "Blood units available for each blood group",
+      "type": "object",
+      "properties": {
+        "group": { "type": "string", "description": "Blood group (e.g., A+, O-)" },
+        "units": { "type": "number", "description": "Number of units available" },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      },
+      "required": ["group", "units"]
+    },  
+    "Donor": {
+      "title": "Donor",
+      "description": "Registered blood donor information",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "bloodGroup": { "type": "string" },
+        "phone": { "type": "string" },
+        "location": { "type": "string" },
+        "lastDonationDate": { "type": "string", "format": "date" },
+        "isAvailable": { "type": "boolean" },
+        "email": { "type": "string", "format": "email" }
+      },
+      "required": ["name", "bloodGroup", "phone", "isAvailable"]
+    },
+    "BloodRequest": {
+      "title": "BloodRequest",
+      "description": "Request for blood from hospitals or individuals",
+      "type": "object",
+      "properties": {
+        "patientName": { "type": "string" },
+        "bloodGroup": { "type": "string" },
+        "hospital": { "type": "string" },
+        "unitsNeeded": { "type": "number" },
+        "status": { "type": "string", "enum": ["Pending", "Completed", "Emergency"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" }
+      },
+      "required": ["patientName", "bloodGroup", "hospital", "unitsNeeded", "status"]
+    },
+    "EmergencyAlert": {
+      "title": "EmergencyAlert",
+      "description": "Alert sent for urgent blood needs",
+      "type": "object",
+      "properties": {
+        "bloodGroup": { "type": "string" },
+        "location": { "type": "string" },
+        "message": { "type": "string" },
+        "sentAt": { "type": "string", "format": "date-time" },
+        "sentBy": { "type": "string" }
+      },
+      "required": ["bloodGroup", "location", "message", "sentAt"]
+    }
+  },
+  "firestore": {
+    "/inventory/{groupId}": {
+      "schema": "Inventory",
+      "description": "Blood inventory units"
+    },
+    "/donors/{donorId}": {
+      "schema": "Donor",
+      "description": "Donor records"
+    },
+    "/requests/{requestId}": {
+      "schema": "BloodRequest",
+      "description": "Blood requests"
+    },
+    "/alerts/{alertId}": {
+      "schema": "EmergencyAlert",
+      "description": "Emergency alerts"
+    }
+  }
+}

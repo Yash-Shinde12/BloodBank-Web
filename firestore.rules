@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: inventory
+    // Fields: group (string), units (number), lastUpdated (timestamp)
+    //
+    // Collection: donors
+    // Fields: name (string), bloodGroup (string), phone (string), location (string), 
+    //         lastDonationDate (string), isAvailable (bool), email (string)
+    //
+    // Collection: requests
+    // Fields: patientName (string), bloodGroup (string), hospital (string), 
+    //         unitsNeeded (number), status (string), createdAt (timestamp), notes (string)
+    //
+    // Collection: alerts
+    // Fields: bloodGroup (string), location (string), message (string), sentAt (timestamp), sentBy (string)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+             ((request.auth.token.email == "varad727@gmail.com" && request.auth.token.email_verified == true) || 
+              request.auth.token.email == "admin@bloodbank.com");
+    }
+
+    function isValidInventory(data) {
+      return data.group is string && data.group.size() > 0 &&
+             data.units is number && data.units >= 0;
+    }
+
+    function isValidDonor(data) {
+      return data.name is string && data.name.size() > 0 &&
+             data.bloodGroup is string &&
+             data.phone is string &&
+             data.isAvailable is bool;
+    }
+
+    function isValidRequest(data) {
+      return data.patientName is string &&
+             data.bloodGroup is string &&
+             data.hospital is string &&
+             data.unitsNeeded is number &&
+             data.status in ["Pending", "Completed", "Emergency"];
+    }
+
+    function isValidAlert(data) {
+      return data.bloodGroup is string &&
+             data.location is string &&
+             data.message is string && data.message.size() < 500;
+    }
+
+    // Rules
+    match /inventory/{groupId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() && isValidInventory(request.resource.data);
+    }
+
+    match /donors/{donorId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() && isValidDonor(request.resource.data);
+    }
+
+    match /requests/{requestId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() && isValidRequest(request.resource.data);
+    }
+
+    match /alerts/{alertId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidAlert(request.resource.data);
+    }
+    
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+  }
+}
